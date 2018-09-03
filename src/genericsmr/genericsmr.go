@@ -8,6 +8,7 @@ import (
 	"genericsmrproto"
 	"io"
 	"log"
+	"dlog"
 	"net"
 	"os"
 	"rdtsc"
@@ -254,7 +255,7 @@ func (r *Replica) replicaListener(rid int, reader *bufio.Reader) {
 			}
 			//TODO: UPDATE STUFF
 			r.Ewma[rid] = 0.99*r.Ewma[rid] + 0.01*float64(rdtsc.Cputicks()-gbeaconReply.Timestamp)
-			log.Println(r.Ewma)
+			log.Println("------zcf complate Evma:",r.Ewma)
 			break
 
 		default:
@@ -369,14 +370,16 @@ func (r *Replica) ReplyBeacon(beacon *Beacon) {
 // updates the preferred order in which to communicate with peers according to a preferred quorum
 func (r *Replica) UpdatePreferredPeerOrder(quorum []int32) {
 	aux := make([]int32, r.N)
+    dlog.Println("-----zcf quorum:", quorum)
 	i := 0
-	for _, p := range quorum {
+	for _, p := range quorum { //0 1 2  【1，2，3，4，5】
 		if p == r.Id {
 			continue
 		}
-		aux[i] = p
+		aux[i] = p  //【 1 ， 2，  ，  ，  】
 		i++
 	}
+	dlog.Println("UpdatePreferredPeerOrder aux1:", aux)
 
 	for _, p := range r.PreferredPeerOrder {
 		found := false
@@ -387,10 +390,11 @@ func (r *Replica) UpdatePreferredPeerOrder(quorum []int32) {
 			}
 		}
 		if !found {
-			aux[i] = p
+			aux[i] = p  //【 1 ， 2， 70 ， 71 ，  】
 			i++
 		}
 	}
 
+	dlog.Println("UpdatePreferredPeerOrder aux2:", aux)
 	r.PreferredPeerOrder = aux
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gpaxos"
 	"log"
+	"dlog"
 	"masterproto"
 	"mencius"
 	"net"
@@ -55,6 +56,7 @@ func main() {
 
 	replicaId, nodeList := registerWithMaster(fmt.Sprintf("%s:%d", *masterAddr, *masterPort))
 
+    dlog.Println("------------zcf registerWithMaster nodeList: ", nodeList)
 	if *doEpaxos {
 		log.Println("Starting Egalitarian Paxos replica...")
 		rep := epaxos.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *beacon, *durable)
